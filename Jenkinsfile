@@ -20,7 +20,21 @@ pipeline{
                 }  
             }
         }
-              
+
+         stage("docker build and docker push"){
+            steps{
+                script{
+                    withCredentials([string(credentialsId: 'docker_password_in_nexus', variable: 'docker_password_in_nexus')]) {
+                        sh '''
+                            docker build -t 108.137.7.77:8083/springapp:${VERSION} . 
+                            docker login -u admin -p $docker_password_in_nexus 108.137.7.77:8083
+                            docker push 108.137.7.77:8083/springapp:${VERSION}
+                            docker rmi 108.137.7.77:8083/springapp:${VERSION}
+                        '''
+                    }
+                }
+            }       
+         }     
     }
 
 }
