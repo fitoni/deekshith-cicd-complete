@@ -4,7 +4,7 @@ pipeline{
         VERSION = "${env.BUILD_ID}"
     }
     stages{
-        stage("sonar quality check"){
+        stage("Sonar Quality Check"){
             steps{
                 script{
                     withSonarQubeEnv(credentialsId: 'sonar-update-token') {
@@ -21,7 +21,7 @@ pipeline{
             }
         }
 
-         stage("docker build and docker push"){
+         stage("Docker Build and Push onto Nexus"){
             steps{
                 script{
                     withCredentials([string(credentialsId: 'docker_password_in_nexus', variable: 'docker_password_in_nexus')]) {
@@ -36,5 +36,9 @@ pipeline{
             }       
          }     
     }
-
+    post {
+		always {
+			mail bcc: '', body: "<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "${currentBuild.result} CI: Project name -> ${env.JOB_NAME}", to: "fitoni77@gmail.com";  
+		}
+	}
 }
