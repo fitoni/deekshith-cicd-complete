@@ -34,7 +34,17 @@ pipeline{
                     }
                 }
             }       
-         }     
+         }  
+
+         stage("Identifying Misconfigurations using Datree"){
+            steps{
+                script{
+                    dir('kubernetes/') {
+                        sh 'helm datree test myapp/'
+                    }
+                }
+            }
+         }   
     }
     post {
 		always {
