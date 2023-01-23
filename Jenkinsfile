@@ -48,6 +48,23 @@ pipeline{
                 }
             }
          }   
+
+         stage("Push Helm Charts onto Nexus"){
+            steps{
+                script{
+                    withCredentials([string(credentialsId: 'docker_password_in_nexus', variable: 'docker_password_in_nexus')]) {
+                        dir('kubernetes/'){
+                            sh '''
+                                helmversion=$(helm show chart myapp/ | grep version | cut -d: -f 2 | tr -d ' ') 
+                                tar -czvf myapp-${helmversion}.tgz myapp/
+                                curl -u admin:$docker_password_in_nexus http://108.137.7.77:8081/repository/deekshith-helm-hosted/ --upload-file myapp-${helmversion}.tgz -v
+                            '''                            
+                        }
+                    }
+                }
+            }       
+         } 
+
     }
     post {
 		always {
